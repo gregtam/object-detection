@@ -10,4 +10,6 @@ pedestrian_tracking.py: Given a video, this file uses the Histogram of Oriented 
 
 walking2.mp4: Sample walking video.
 
+walking2_small.mp4: A smaller resolution version of walking2.mp4. This allows for faster computation.
+
 youtube_pedestrian_tracking.py: Does the same thing as pedestrian_tracking.py, but instead of loading in a local file, it takes in a YouTube ID and does analysis on that.
