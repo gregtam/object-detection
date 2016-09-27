@@ -251,6 +251,6 @@ if not '-k' in optdict and 'temp_youtube_vid.mp4' in os.listdir('.'):
 if save_video:
     print 'Video saved as {} (in {})\n'.format(file_name, datetime.now() - start)
 
-# When everything done, release the capture
+# When everything is done, release the capture
 cap.release()
 cv2.destroyAllWindows()

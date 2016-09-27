@@ -24,8 +24,6 @@ if save_video:
         raise Exception('Cannot specify more than one video name')
     file_name = args[0]
 
-    print file_name
-
 faceCascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 video_capture = cv2.VideoCapture(1)  # number indicates which webcam
 

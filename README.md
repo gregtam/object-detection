@@ -4,7 +4,7 @@ A few files showing OpenCV used in a live application.
 
 face_tracking.py: Uses haar-like features to find a face using a webcam. It then draws a box around the faces found in real time.
 
-haarcascade_frontalface_default.xml: XML files for face haar cascade.
+XML_files: A folder containing the XML files used for haar cascades.
 
 pedestrian_tracking.py: Given a video, this file uses the Histogram of Oriented Gradients (HoG) method to find a pedestrian and draws a box around it. There are some other subtleties to speed up this process such as searching in a narrower range.
 

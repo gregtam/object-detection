@@ -183,6 +183,6 @@ for frame_num in range(len(all_frames)):
 if save_video:
     print 'Video saved as {}\n'.format(file_name)
 
-# When everything done, release the capture
+# When everything is done, release the capture
 cap.release()
 cv2.destroyAllWindows()
