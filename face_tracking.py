@@ -24,7 +24,7 @@ if save_video:
         raise Exception('Cannot specify more than one video name')
     file_name = args[0]
 
-faceCascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+faceCascade = cv2.CascadeClassifier('XML_files/haarcascade_frontalface_default.xml')
 video_capture = cv2.VideoCapture(1)  # number indicates which webcam
 
 frame_width = video_capture.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH)
