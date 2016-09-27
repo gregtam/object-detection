@@ -5,7 +5,10 @@ Face tracking with the option of loading
 a video or tracking live.
 
 Options:
-Output video name
+-w: webcam number (This specifies which webcam to use. Default=0)
+
+Args:
+Output video name - name of the output file
 """
 
 from datetime import datetime
@@ -17,6 +20,8 @@ from skimage.filters import gaussian
 
 # Import command-line arguments
 args = sys.argv[1:]
+optlist, args = getopt.getopt(args, 'w:')
+optdict = dict(optlist)
 save_video = len(args) > 0
 
 if save_video:
@@ -25,7 +30,12 @@ if save_video:
     file_name = args[0]
 
 faceCascade = cv2.CascadeClassifier('XML_files/haarcascade_frontalface_default.xml')
-video_capture = cv2.VideoCapture(1)  # number indicates which webcam
+
+# Specify webcam number
+if '-w' in optdict:
+    video_capture = cv2.VideoCapture(int(optdict['-w']))  # number indicates which webcam
+else:
+    video_capture = cv2.VideoCapture(0)
 
 frame_width = video_capture.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH)
 frame_height = video_capture.get(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT)
