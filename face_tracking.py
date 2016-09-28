@@ -16,13 +16,15 @@ import getopt
 import sys
 
 import cv2
+# import numpy as np
 from skimage.filters import gaussian
 
 # Import command-line arguments
 args = sys.argv[1:]
-optlist, args = getopt.getopt(args, 'w:')
+optlist, args = getopt.getopt(args, 'w:', ['blur_face'])
 optdict = dict(optlist)
 save_video = len(args) > 0
+blur_face = '--blur_face' in optdict
 
 if save_video:
     if len(args) > 1:
@@ -34,6 +36,7 @@ faceCascade = cv2.CascadeClassifier('XML_files/haarcascade_frontalface_default.x
 # Specify webcam number
 if '-w' in optdict:
     video_capture = cv2.VideoCapture(int(optdict['-w']))  # number indicates which webcam
+# Otherwise, use webcam 0
 else:
     video_capture = cv2.VideoCapture(0)
 
@@ -56,14 +59,18 @@ while 1:
     faces = faceCascade.detectMultiScale(gray,
                                          scaleFactor=1.1,
                                          minNeighbors=5,
-                                         minSize=(30, 30),
+                                         # Minimum size set large enough to capture random
+                                         # small squares
+                                         minSize=(new_shape[1]/5, new_shape[1]/5),
                                          flags=cv2.cv.CV_HAAR_SCALE_IMAGE
                                         )
 
     # Draw a rectangle around the faces
     for (x, y, w, h) in faces:
-        # frame[y:y+h, x:x+w, :] = gaussian(frame[y:y+h, x:x+w], 15) * 255
-        cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 255, 255), 2)
+        if blur_face:
+            frame[y:y+h, x:x+w, :] = gaussian(frame[y:y+h, x:x+w], 15, multichannel=False) * 255
+        else:
+            cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 255, 255), 2)
 
     if save_video:
         output_video.write(frame)
