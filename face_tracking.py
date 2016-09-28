@@ -5,10 +5,11 @@ Face tracking with the option of loading
 a video or tracking live.
 
 Options:
+-s: scale factor (The amount width and height are scaled by. Higher improves speed but is coarser.)
 -w: webcam number (This specifies which webcam to use. Default=0)
 
 Args:
-Output video name - name of the output file
+Output video name (optional) - name of the output file
 """
 
 from datetime import datetime
@@ -16,12 +17,12 @@ import getopt
 import sys
 
 import cv2
-# import numpy as np
+import numpy as np
 from skimage.filters import gaussian
 
 # Import command-line arguments
 args = sys.argv[1:]
-optlist, args = getopt.getopt(args, 'w:', ['blur_face'])
+optlist, args = getopt.getopt(args, 's:w:', ['blur_face'])
 optdict = dict(optlist)
 save_video = len(args) > 0
 blur_face = '--blur_face' in optdict
@@ -43,14 +44,19 @@ else:
 frame_width = video_capture.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH)
 frame_height = video_capture.get(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT)
 
-scale_factor = 3
-new_shape = (int(frame_width/scale_factor), int(frame_height/scale_factor))
+if '-s' in optdict:
+    scale_factor = float(optdict['-s'])
+else:
+    scale_factor = 1
+new_shape = (int(round(frame_width/scale_factor)), int(round(frame_height/scale_factor)))
 
 if save_video:
-    fourcc = cv2.cv.CV_FOURCC('m', 'p', '4', 'v')
-    output_video = cv2.VideoWriter(file_name, fourcc, 8, new_shape)
+    all_frames = []
+    frame_times = []
 
 while 1:
+    if save_video:
+        frame_start_time = datetime.now()
     # Capture frame-by-frame
     ret, frame = video_capture.read()
     frame = cv2.resize(frame, new_shape)
@@ -73,13 +79,31 @@ while 1:
             cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 255, 255), 2)
 
     if save_video:
-        output_video.write(frame)
+        # Add frames to a list, so we can save them later
+        all_frames.append(frame)
 
     # Display the resulting frame (mirrored)
     cv2.imshow('Video', cv2.flip(frame, 1))
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
+
+    # Compute the time to process the frame and add to array
+    if save_video:
+        frame_times.append((datetime.now() - frame_start_time).total_seconds())
+
+if save_video:
+    print '\nSaving video...'
+    fourcc = cv2.cv.CV_FOURCC(*list('mp4v'))
+    
+    # Save video with the proper frame rate.
+    # We do this because the frames might 
+    # be processed slower depending on scale_factor.
+    output_video = cv2.VideoWriter(file_name, fourcc, fps=round(1/np.mean(frame_times)), frameSize=new_shape)
+    for frame in all_frames:
+        output_video.write(frame)
+    print 'Done saving video.\n'
+
 
 # When everything is done, release the capture
 video_capture.release()
