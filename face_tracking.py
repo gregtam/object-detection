@@ -94,15 +94,16 @@ while 1:
 
 if save_video:
     print '\nSaving video...'
+    start = datetime.now()
     fourcc = cv2.cv.CV_FOURCC(*list('mp4v'))
-    
+
     # Save video with the proper frame rate.
     # We do this because the frames might 
     # be processed slower depending on scale_factor.
     output_video = cv2.VideoWriter(file_name, fourcc, fps=round(1/np.mean(frame_times)), frameSize=new_shape)
     for frame in all_frames:
         output_video.write(frame)
-    print 'Done saving video.\n'
+    print 'Done saving video (in {})\n'.format(datetime.now() - start)
 
 
 # When everything is done, release the capture
