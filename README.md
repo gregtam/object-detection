@@ -6,7 +6,7 @@ face_tracking.py: Uses haar-like features to find a face using a webcam. It then
 
 XML_files: A folder containing the XML files used for haar cascades.
 
-pedestrian_tracking.py: Given a video, this file uses the Histogram of Oriented Gradients (HoG) method to find a pedestrian and draws a box around it. There are some other subtleties to speed up this process such as searching in a narrower range.
+pedestrian_tracking.py: Given a video, this file uses the <a href="https://en.wikipedia.org/wiki/Histogram_of_oriented_gradients">Histogram of Oriented Gradients (HoG)</a> method to find a pedestrian and draws a box around it. There are some other subtleties to speed up this process such as searching in a narrower range.
 
 walking2.mp4: Sample walking video.
 
