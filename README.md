@@ -1,8 +1,8 @@
 # Image-Detection
 
-A few files showing OpenCV used in a live application. 
+A few files showing <a href="http://docs.opencv.org/3.0-beta/doc/py_tutorials/py_tutorials.html">OpenCV</a> used in a live application. 
 
-face_tracking.py: Uses haar-like features to find a face using a webcam. It then draws a box around the faces found in real time.
+face_tracking.py: Uses <a href="https://en.wikipedia.org/wiki/Haar-like_features">haar-like features</a> to find a face using a webcam. It then draws a box around the faces found in real time.
 
 XML_files: A folder containing the XML files used for haar cascades.
 
