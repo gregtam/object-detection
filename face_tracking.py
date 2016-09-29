@@ -74,7 +74,21 @@ while 1:
     # Draw a rectangle around the faces
     for (x, y, w, h) in faces:
         if blur_face:
-            frame[y:y+h, x:x+w, :] = gaussian(frame[y:y+h, x:x+w], 15, multichannel=False) * 255
+            # Circular blur
+            face_frame = frame[y:y+h, x:x+w]
+            blur_img = gaussian(face_frame, 16) * 255
+
+            # Mesh grids (accounts for even or odd width and height)
+            y_f, x_f = np.ogrid[-h/2.0 + 0.5 : h/2.0 + 0.5,
+                                -w/2.0 + 0.5 : w/2.0 + 0.5]
+
+            # Draws an elliptical blur.
+            # OpenCV seems to only return squares (hence we will
+            # only ever use circles). Nevertheless, we put the code
+            # in to deal with ellipses.
+            mask = (x_f/(w/2.0))**2 + (y_f/(h/2.0))**2 <= 1
+            face_frame[mask] = blur_img[mask]
+
         else:
             cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 255, 255), 2)
 
