@@ -1,4 +1,4 @@
-#!/Users/gregorytam/anaconda/bin/python
+#!/usr/bin/env python
 
 # TODO: stabilize rectangle - write code to limit amount rectangle size can change.
 
@@ -7,11 +7,14 @@ Load all frames ahead of time and then
 analyze them.
 
 Options:
+-k: keep original video (If tag is present, then the original YouTube video will not be deleted.)
+-p: padding amount (Amount to increase box by to search for new pedestrian. Default=10)
 -s: scale factor (The amount width and height are scaled by. Higher improves speed but is coarser.)
 -t: sleep time (The amount of time to wait between displaying frames. This is 1/frame_rate. Default=33)
--k: keep video (If tag is present, then the original YouTube video will not be deleted.)
---save_as: If present, then it saves the video. This tag specifies output video name.
---input_link: Unique youtube id code of video we wish to download.
+--save_as: name of saved video (This tag specifies output video name.
+
+Args:
+Input id: Unique youtube id code of video we wish to download.
 """
 
 from __future__ import unicode_literals  # used to properly download the youtube video
@@ -28,7 +31,7 @@ import youtube_dl
 
 # Import command-line arguments
 args = sys.argv[1:]
-optlist, args = getopt.getopt(args, 'ks:t:', ['resolution=', 'save_as='])
+optlist, args = getopt.getopt(args, 'kp:s:t:', ['resolution=', 'save_as='])
 optdict = dict(optlist)
 
 save_video = '--save_as' in optdict
@@ -38,21 +41,24 @@ if save_video:
 if len(args) == 1:
     youtube_id = args[0]
 
+    # Codec issue with choosing resolution right now.
+    # Video downloads properly but doesn't get imports
+    # into Python properly.
     choose_res = '--resolution' in optdict
     if choose_res:
         res = int(optdict['--resolution'])
         # Get the youtube video's available resolutions.
         # This works by sending a terminal command and retrieving the results
         cmd = 'youtube-dl -F {id}'.format(id=youtube_id).split()
-        output = subprocess.Popen( cmd, stdout=subprocess.PIPE ).communicate()[0]
+        output = subprocess.Popen(cmd, stdout=subprocess.PIPE ).communicate()[0]
         output = output.strip('\n')
 
         # Split the output lines up
         output_lines = np.array(output.split('\n'))
-        # Starting point of the resolution
+        # Starting point of the resolution (must keep the spaces since it matches formatting)
         res_index = int(np.where(output_lines == 'format code  extension  resolution note')[0])
         # Select only lines corresponding to resolution information
-        output_lines = output_lines[res_index + 1:]
+        output_lines = output_lines[res_index+1:]
 
         # Create a table with the resolution information
         fmt_list = []
@@ -111,13 +117,22 @@ print '\nLoading video...'
 ret = True
 all_frames = []
 all_small_frames = []
+
+if '-k' in optdict:
+    try:
+        padding_amt = int(optdict['-k'])
+    except:
+        print 'Options Error: padding_amt must be an integer.\n'
+else:
+    padding_amt = 10
+
 # Amount to scale image down to find pedestrians.
 # Higher means faster, but it will be coarser.
 if '-s' in optdict:
     try:
         scale_factor = float(optdict['-s'])
     except:
-        print 'Options Error: scale_factor must be a float\n'
+        print 'Options Error: scale_factor must be a number.\n'
 else:  # default scale factor
     scale_factor = 1
 
@@ -125,7 +140,7 @@ if '-t' in optdict:
     try:
         sleep_time = int(optdict['-t'])
     except:
-        print 'Options Error: sleep_time must be an integer\n'
+        print 'Options Error: sleep_time must be an integer.\n'
 else:  # default sleep time
     sleep_time = 33
 

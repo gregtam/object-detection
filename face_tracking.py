@@ -1,12 +1,17 @@
-#!/Users/gregorytam/anaconda/bin/python
+#!/usr/bin/env python
 
 """
-Face tracking with the option of loading
-a video or tracking live.
+Face tracking with the option of loading a video or tracking live.
+The options -r and -s change the resolution of the image to change
+tracking capabilities and also change the output video resolution.
+Only one of these options is allowed.
 
 Options:
--s: scale factor (The amount width and height are scaled by. Higher improves speed but is coarser.)
+-r: resolution (The height of the resolution the video is changed to. Cannot be used with -s.)
+-s: scale factor (The amount width and height are scaled by. Higher improves speed but is coarser. Default=1)
 -w: webcam number (This specifies which webcam to use. Default=0)
+
+--blur_face: Blur the face instead of drawing a box
 
 Args:
 Output video name (optional) - name of the output file
@@ -22,7 +27,7 @@ from skimage.filters import gaussian
 
 # Import command-line arguments
 args = sys.argv[1:]
-optlist, args = getopt.getopt(args, 's:w:', ['blur_face'])
+optlist, args = getopt.getopt(args, 'r:s:w:', ['blur_face'])
 optdict = dict(optlist)
 save_video = len(args) > 0
 blur_face = '--blur_face' in optdict
@@ -44,11 +49,30 @@ else:
 frame_width = video_capture.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH)
 frame_height = video_capture.get(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT)
 
-if '-s' in optdict:
-    scale_factor = float(optdict['-s'])
-else:
-    scale_factor = 1
-new_shape = (int(round(frame_width/scale_factor)), int(round(frame_height/scale_factor)))
+res_opt = '-r' in optdict
+scale_opt = '-s' in optdict
+if res_opt and scale_opt:
+    raise Exception('Options error: Cannot specify both -r and -s.')
+
+elif res_opt:
+    try:
+        resolution = int(optdict['-r'])
+    except:
+        raise Exception('Options Error: resolution must be an integer.\n')
+
+elif scale_opt:
+    try:
+        scale_factor = float(optdict['-s'])
+    except:
+        raise Exception('Options Error: scale_factor must be a number.\n')
+
+
+if res_opt:
+    new_shape = (int(frame_width/frame_height * resolution), resolution)
+elif scale_opt:
+    new_shape = (int(round(frame_width/scale_factor)), int(round(frame_height/scale_factor)))
+else:  # If scale_factor isn't specified, set to 1
+    new_shape = (int(frame_width), int(frame_height))
 
 if save_video:
     all_frames = []
@@ -65,8 +89,8 @@ while 1:
     faces = faceCascade.detectMultiScale(gray,
                                          scaleFactor=1.1,
                                          minNeighbors=5,
-                                         # Minimum size set large enough to capture random
-                                         # small squares
+                                         # Minimum size set large enough to not 
+                                         # capture random small squares
                                          minSize=(new_shape[1]/5, new_shape[1]/5),
                                          flags=cv2.cv.CV_HAAR_SCALE_IMAGE
                                         )
@@ -76,7 +100,7 @@ while 1:
         if blur_face:
             # Circular blur
             face_frame = frame[y:y+h, x:x+w]
-            blur_img = gaussian(face_frame, 16) * 255
+            blur_img = gaussian(face_frame, 20) * 255
 
             # Mesh grids (accounts for even or odd width and height)
             y_f, x_f = np.ogrid[-h/2.0 + 0.5 : h/2.0 + 0.5,

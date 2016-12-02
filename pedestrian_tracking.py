@@ -1,11 +1,11 @@
-#!/Users/gregorytam/anaconda/bin/python
+#!/usr/bin/env python
 
 """
 Load all frames ahead of time and then
 analyze them.
 
 Options:
--s: scale factor (The amount width and height are scaled by. Higher improves speed but is coarser.)
+-s: scale factor (The amount width and height are scaled by. Higher shortens time to track but is coarser.)
 -t: sleep time (The amount of time to wait between displaying frames. This is 1/frame_rate. Default=33)
 --use_webcam: Use webcam instead of loading from a video. This is not live since pedestrian detection is slow.
               Instead, it will capture the video first, then do detection afterwards
@@ -55,7 +55,7 @@ if '-s' in optdict:
     try:
         scale_factor = float(optdict['-s'])
     except:
-        print 'Options Error: scale_factor must be a float\n'
+        print 'Options Error: scale_factor must be a number.\n'
 else:  # default scale factor
     scale_factor = 1
 
@@ -64,7 +64,7 @@ if '-t' in optdict:
     try:
         sleep_time = int(optdict['-t'])
     except:
-        print 'Options Error: sleep_time must be an integer\n'
+        print 'Options Error: sleep_time must be an integer.\n'
 elif use_webcam:  # default sleep time for webcam recording
     sleep_time = 8
 else:  # default sleep time for videos
@@ -77,7 +77,7 @@ new_shape = (int(frame_width/scale_factor), int(frame_height/scale_factor))
 
 
 if save_video:
-    fourcc = cv2.cv.CV_FOURCC('m', 'p', '4', 'v')
+    fourcc = cv2.cv.CV_FOURCC(*list('mp4v'))
     output_video = cv2.VideoWriter(file_name, fourcc, 30, (frame_width, frame_height))
 
 while ret:
@@ -161,7 +161,7 @@ for frame_num in range(0, len(all_small_frames)):
                       (255, 255, 255), 
                       2)
 
-print 'Done detecting pedestrians (in {})\n'.format(datetime.now() - start)
+print 'Done detecting pedestrians (in {}).\n'.format(datetime.now() - start)
 
 if save_video:
     print 'Saving video...'
@@ -181,7 +181,7 @@ for frame_num in range(len(all_frames)):
     frame_num += 1
 
 if save_video:
-    print 'Video saved as {}\n'.format(file_name)
+    print 'Saved video as {} (in {}).\n'.format(file_name, datetime.now() - start)
 
 # When everything is done, release the capture
 cap.release()
