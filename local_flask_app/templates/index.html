@@ -1,0 +1,42 @@
+<html>
+    <script>
+        function changeFilter()
+        {
+            var img = document.getElementById('video_stream')
+            img.src = "{{ url_for('video_feed', filter_type=1) }}"
+            return false;
+        }
+    </script>
+    <style>
+        #container {
+            margin: 0px auto;
+            width: 500px;
+            height: 375px;
+            border: 0px;
+        }
+        #videoElement {
+            width: 500px;
+            height: 375px;
+            background-color: #666;
+        }
+        #title {
+            line-height: 100px;
+        }
+    </style>
+    <body style='margin: 0;'>
+        <div style='background-color: #008774; height: 100px;'>
+            <center>
+                <h1 id='title'>
+                    <font face='arial' style='color: white;'>Face Detection</font>
+                </h1>
+            </center>
+        </div>
+
+        <div>
+            <center>
+                <img id='video_stream' src="{{ url_for('video_feed', filter_type=0) }}"></br>
+            </center>
+        </div>
+
+    </body>
+</html>

@@ -63,7 +63,7 @@ def find_faces(frame, min_size):
 
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-    faces = faceCascade.detectMultiScale(gray,
+    faces = face_cascade.detectMultiScale(gray,
                                          scaleFactor=1.1,
                                          minNeighbors=5,
                                          # Minimum size set large enough to not 
@@ -115,7 +115,7 @@ if save_video:
     else:
         file_name = args[0]
 
-faceCascade = cv2.CascadeClassifier('../XML_files/haarcascade_frontalface_default.xml')
+face_cascade = cv2.CascadeClassifier('../XML_files/haarcascade_frontalface_default.xml')
 
 # Specify webcam number
 if '-w' in optdict:

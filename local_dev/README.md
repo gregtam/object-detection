@@ -5,7 +5,7 @@ This folder contains few files showing <a href="http://docs.opencv.org/3.0-beta/
 ## face_tracking.py
 Uses <a href="https://en.wikipedia.org/wiki/Haar-like_features">Haar-like features</a> to find a face using a webcam. It then draws a box around the faces found in real time.
 
-To use this, we either run `python face_tracking.py` or `./face_tracking.py`. The latter option only works if the Python file is executable. We can achieve this by running `chmod 700 face_tracking.py` or `chmod u+x face_tracking.py`. We can also specify options to this.
+To use this, we either run `python face_tracking.py` or `./face_tracking.py`. The latter option only works if the Python file is executable. We can make this executable by running `chmod 700 face_tracking.py` or `chmod u+x face_tracking.py`. We can also specify options to this.
 
 First, we can specify either the `-r` or `-s` options along with a number to change the resolution  or scale the video dimensions respectively. The number after the `-r` option represents the height of the desired video in pixels. The width will be determined by keeping the video proportions the same. The `-s` scales width and height down by the given number. For example, if we scale by 2, it will shrink both the height and width by 2. The higher the scale factor, the quicker the algorithm will run since the detection is being performed on smaller images. However, performance will be decreased.
 ```

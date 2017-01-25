@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 
 from datetime import datetime
-from flask import Flask, url_for, render_template, request, Response
-from flask_wtf import Form
+from flask import Flask, render_template, request, Response
 import getopt
 import os
 import sys
@@ -11,9 +10,8 @@ import cv2
 import numpy as np
 import pandas as pd
 from PIL import Image
-from skimage.filters import gaussian
 
-app = Flask(__name__, static_folder=os.getcwd())
+app = Flask(__name__)
 
 def get_command_line_arguments():
     args = sys.argv[1:]
@@ -52,7 +50,7 @@ def capture_webcam_img(video_capture, webcam_nbr=0):
     if debug:
         print '        Scale Image: {}'.format(datetime.now() - start)
 
-    return img
+    return ret, img
 
 def get_face_img(video_capture, filter_type=0, webcam_nbr=0):
     """
@@ -103,7 +101,7 @@ def get_face_img(video_capture, filter_type=0, webcam_nbr=0):
     face_cascade = cv2.CascadeClassifier('../XML_files/haarcascade_frontalface_default.xml')
 
     start = datetime.now()
-    frame = capture_webcam_img(video_capture, webcam_nbr)
+    ret, frame = capture_webcam_img(video_capture, webcam_nbr)
     if debug:
         print '    Capture Image: {}'.format(datetime.now() - start)
    
@@ -125,7 +123,7 @@ def get_face_img(video_capture, filter_type=0, webcam_nbr=0):
             cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 255, 255), 2)
         elif filter_type == 1:
             # Blur face
-            frame = _add_blur_to_face(frame, (x, y, w, h))
+            cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 255, 255), 2)
     if debug:
         print '    Draw Rectangles: {}'.format(datetime.now() - start)
 
@@ -145,9 +143,9 @@ def generate_face_img(video_capture, filter_type):
         if debug:
             print 'Encode to JPEG: {}'.format(datetime.now() - start)
             print
-
-        yield (b'--frame\n'
-               b'Content/Type: image/jpeg\n\n' + jpeg_frame.tobytes() + b'\n')
+        if ret:
+            yield (b'--frame\n'
+                   b'Content/Type: image/jpeg\n\n' + jpeg_frame.tobytes() + b'\n')
 
 @app.route('/')
 def index():
@@ -168,7 +166,9 @@ def video_feed(filter_type):
         print 'webcam number', webcam_nbr
 
     start = datetime.now()
-    video_capture = cv2.VideoCapture(webcam_nbr)
+    # print 'file: ', url_for('static', filename='walking_sample.mp4')
+    # video_capture = cv2.VideoCapture('static/walking_sample.mp4')
+    video_capture = cv2.VideoCapture(0)
     if debug:
         print '        cv2.VideoCapture: {}'.format(datetime.now() - start)
 

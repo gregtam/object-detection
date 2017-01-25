@@ -1,0 +1,8 @@
+---
+applications:
+- name: webcam-test
+  memory: 2GB
+  disk_quota: 2GB
+  instances: 1
+  buildpack: https://github.com/cloudfoundry/python-buildpack.git
+  command: gunicorn --bind 0.0.0.0:$PORT image_flask_app:app

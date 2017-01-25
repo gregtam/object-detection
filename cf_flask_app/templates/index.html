@@ -1,0 +1,70 @@
+<!-- <!DOCTYPE html> -->
+<html>
+    <style>
+        #title {
+            line-height: 100px;
+        }
+        #webcamVideo {
+            background-color: #666;
+            /*position: absolute;*/
+            /*position: relative;*/
+            left: 100px;
+            right: 100px;
+            width: 640px;
+            height: 480px;
+        }
+        #webcamCanvas {
+            position: absolute;
+            /*position: relative;*/
+            top: 200px;
+            left: 0px;
+            right: 0px;
+            background-color: red;
+        }
+        #snapshotCanvas {
+            width: 640px;
+            height: 480px;
+            background-color: red;
+        }
+    </style>
+
+    <body style='margin: 0; padding: 0; border: 0;'>
+        <div style='background-color: #008774; height: 100px;'>
+            <center>
+                <h1 id='title'>
+                    <font face='arial' style='color: white;'>Face Detection</font>
+                </h1>
+            </center>
+        </div>
+
+        <video id='webcamVideo' width=640px height=480px></video></br>
+        <canvas id='webcamCanvas' width=640px height=480></canvas></br>
+        <img id='faceImg' src='static/face.png' style='display: none;'>
+
+
+     <!--    <form><input type='button' id='snapshot' value="snapshot"/></form> 
+        <canvas id='snapshotCanvas' width=640px height=480px></canvas></br>
+
+        <script language='javascript'> 
+            document.getElementById('snapshot').onclick = function() { 
+                console.log("start");
+                var video = document.getElementById('webcamVideo');
+                // var video = document.querySelector('video');
+                console.log(video);
+                var canvas = document.getElementById('snapshotCanvas'); 
+                console.log(canvas);
+                var ctx = canvas.getContext('2d'); 
+                console.log(ctx);
+                // ctx.drawImage(video, 0, 0, 680, 480);
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            } 
+        </script>  -->
+
+
+        <!-- <button id='snapshot'>Snapshot!</button> -->
+
+        <script src="{{ url_for('static', filename='webcam.js') }}"></script>
+        <!-- <script src="../static/webcam.js"></script> -->
+    </body>   
+
+</html>

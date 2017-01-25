@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+
+<video autoplay></video>
+
+<p>Source: <a href='http://joshondesign.com/p/books/canvasdeepdive/chapter13.html'>Link</a></p>
+
+<form><input type='button' id='snapshot' value="snapshot"/></form> 
+ 
+<canvas id='canvas' width='640' height='480'></canvas> 
+ 
+<script language='javascript'> 
+    document.getElementById('snapshot').onclick = function() { 
+        console.log('start');
+        var video = document.querySelector('video'); 
+        console.log(video);
+        var canvas = document.getElementById('canvas'); 
+        console.log(canvas);
+        var ctx = canvas.getContext('2d'); 
+        console.log(ctx);
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    } 
+</script> 
+
+<script>
+    var constraints = {audio: false, video: true}; 
+
+
+    var video = document.querySelector('video');
+
+    function streamVideo(mediaStream) {
+        video.srcObject = mediaStream;
+        video.onloadedmetadata = function(e) {
+            video.play();
+        }
+    }
+
+    navigator.mediaDevices.getUserMedia(constraints)
+        .then(streamVideo)
+        .catch(function(err) {console.log(err.name + ": " + err.message);}); // always check for errors at the end.
+
+</script>
+
+
+</html>
