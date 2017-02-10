@@ -12,19 +12,23 @@
             right: 100px;
             width: 640px;
             height: 480px;
+            display: none;
         }
         #webcamCanvas {
-            position: absolute;
-            /*position: relative;*/
-            top: 200px;
-            left: 0px;
-            right: 0px;
+            /*position: absolute;*/
+            position: relative;
+            top: 100px;
+            /*left: 0px;*/
+            /*right: 0px;*/
             background-color: red;
+            display: none;
         }
-        #snapshotCanvas {
-            width: 640px;
-            height: 480px;
-            background-color: red;
+        #postDetectCanvas {
+            position: relative;
+            /*top: 300px;*/
+            /*left: 300px;*/
+            /*left: 0px;*/
+            background-color: blue;
         }
     </style>
 
@@ -37,33 +41,26 @@
             </center>
         </div>
 
-        <video id='webcamVideo' width=640px height=480px></video></br>
-        <canvas id='webcamCanvas' width=640px height=480></canvas></br>
-        <img id='faceImg' src='static/face.png' style='display: none;'>
+        <video id='webcamVideo'></video></br>
+        <!-- For some reason, the width and height must be specified here.
+             If it is put in the style tag at the top of the document, it
+             takes a size of 300x150, then gets stretched, making it blurry.
+         -->
+        <canvas id='webcamCanvas' width=640px height=480px></canvas></br>
+        <!-- We require a separate canvas for detection. If we edited
+             the webcamCanvas, then the algorithm would not run on it.
+        -->
+        <canvas id='postDetectCanvas' width=640px height=480px></canvas></br>
 
 
-     <!--    <form><input type='button' id='snapshot' value="snapshot"/></form> 
-        <canvas id='snapshotCanvas' width=640px height=480px></canvas></br>
-
-        <script language='javascript'> 
-            document.getElementById('snapshot').onclick = function() { 
-                console.log("start");
-                var video = document.getElementById('webcamVideo');
-                // var video = document.querySelector('video');
-                console.log(video);
-                var canvas = document.getElementById('snapshotCanvas'); 
-                console.log(canvas);
-                var ctx = canvas.getContext('2d'); 
-                console.log(ctx);
-                // ctx.drawImage(video, 0, 0, 680, 480);
-                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            } 
-        </script>  -->
-
-
-        <!-- <button id='snapshot'>Snapshot!</button> -->
+        <button class='filterButton'>Invert Face Colours</button>
+        <button class='filterButton'>Fill Black Box</button>
+        <button class='filterButton'>Draw White Box</button>
+        <button class='filterButton'>Nothing</button>
 
         <script src="{{ url_for('static', filename='webcam.js') }}"></script>
+
+
         <!-- <script src="../static/webcam.js"></script> -->
     </body>   
 

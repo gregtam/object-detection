@@ -1,9 +1,4 @@
 (function() {
-
-    var constraints = {audio: false, video: true}; 
-    var video = document.getElementById('webcamVideo');
-    // var video = document.querySelector('video');
-
     function streamVideo(mediaStream) {
         video.srcObject = mediaStream;
         video.onloadedmetadata = function(e) {
@@ -11,71 +6,170 @@
         }
     }
 
-    navigator.mediaDevices.getUserMedia(constraints)
-        .then(streamVideo)
-        .catch(function(err) {console.log(err.name + ": " + err.message);}); // always check for errors at the end.
-
-    var canvas = document.getElementById('webcamCanvas');
-    var ctx = canvas.getContext('2d');
-    var faces = [[248, 195, 143, 143]];
-
-    // Testing with a fixed image
-    var faceImg = document.querySelector('img');
-    console.log('HERE ' + faceImg);
-
     function waitForFrame() {
         window.setTimeout(function() {
             grabFrameData();
-        }, 2000);
+        }, 100);
     }
-    waitForFrame();
-
-    // function grabFrameData() {
-    //     var delay = 500;
-    //     console.log('Start Time: ' + new Date().getTime());
-    //     window.setTimeout(function() {canvas.toBlob(postImage, 'image/jpeg', 1);}, delay);
-    //     console.log('Get Faces: ' + new Date().getTime());
-    //     window.setTimeout(function() {ctx.drawImage(video, 0, 0, canvas.width, canvas.height);}, delay);
-    //     console.log('Draw Webcam: ' + new Date().getTime());
-
-    //     window.setTimeout(function() {
-    //         console.log(faces);
-    //         for (var i = 0; i < faces.length; i++) {
-    //             var face = faces[i];
-    //             console.log('HERE ' + faces);
-    //             ctx.fillRect(face[0], face[1], face[2], face[3]);
-    //         };
-    //     }, delay);
-    //     console.log('Filled Faces: ' + new Date().getTime());
-
-    //     window.setTimeout(function() {
-    //         waitForFrame();
-    //     }, 1000);
-    // }
 
     function grabFrameData() {
-        // console.log('Start Time: ' + new Date().getTime());
-        canvas.toBlob(postImage, 'image/jpeg', 1);
-        // console.log('Get Faces: ' + new Date().getTime());
+        webcamCanvas.toBlob(postImage, 'image/jpeg', 1);
 
-        console.log('faceImg: ' + faceImg);
-        ctx.drawImage(faceImg, 0, 0, canvas.width, canvas.height);
-        // ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        // console.log('Draw Webcam: ' + new Date().getTime());
+        webcamCtx.drawImage(video, 0, 0, webcamCanvas.width, webcamCanvas.height);
 
-        // ctx.fillRect(0, 0, 100, 100);
-        ctx.font = '36px serif';
-        ctx.fillText(faces + '   ' + faces.length, 0, 140);
+        // webcamCtx.font = '36px serif';
+        // webcamCtx.fillText(faces + '   ' + faces.length, 0, 140);
+
+        var imageData = webcamCtx.getImageData(0, 0, webcamCanvas.width, webcamCanvas.height);
+        var pixelCopy = imageData.data.slice();
 
         for (var i = 0; i < faces.length; i++) {
             var face = faces[i];
-            // console.log(faces[0]);
-            // ctx.fillRect(0, 0, 100, 100);
-            ctx.fillRect(face[0], face[1], face[2], face[3]);
+            var faceX = face[0];
+            var faceY = face[1];
+            var faceW = face[2];
+            var faceH = face[3];
+
+            // postDetectCtx.clearRect(0, 0, postDetectCanvas.width, postDetectCanvas.height);
+            // postDetectCtx.fillRect(faceX, faceY, faceW, faceH);
+            // postDetectCtx.strokeRect(faceX, faceY, faceW, faceH);
+
+            // Creates a copy so we can change pixels based off original pixels.
+            // If we edited imageData pixels, then the neighbouring pixel may be
+            // affected (e.g., in a gaussian blur).
+
+            // var convMatrix = [[0, -1, 0], [-1, 4, -1], [0, -1, 0]];
+            // var convMatrix = [0, -1, 0, -1, 4, -1, 0, -1, 0];
+
+            for (var j = 0; j < imageData.data.length; j++) {
+                var coordinates = mapIndexToCoord(j);
+                var row = coordinates[0];
+                var col = coordinates[1];
+
+                if (col >= faceX && col <= faceX + faceW && row >= faceY && row <= faceY + faceH) {
+                    if (j % 4 < 3) {
+                        if (filterNum == 0)
+                            pixelCopy[j] = 255 - imageData.data[j];
+                        // pixelIndices = grabSurroundingPixelIndices(imageData.data, row, col, 21);
+                        // console.log('end');
+                        // pixelValues = mapIndicestoValues(imageData.data, pixelIndices);
+                        // pixelCopy[j] = dotProduct(pixelValues, convMatrix);
+                    }
+                }
+            }
+
+            // Copies pixelCopy back to imageData
+            if (filterNum == 0) {
+                for (var j = 0; j < imageData.data.length; j++) {
+                    imageData.data[j] = pixelCopy[j];
+                }
+            }
         };
-        // console.log('Filled Faces: ' + new Date().getTime());
+
+        postDetectCtx.putImageData(imageData, 0, 0);
+        if (filterNum == 1) {
+            postDetectCtx.fillRect(faceX, faceY, faceW, faceH);
+        } else if (filterNum == 2) {
+            postDetectCtx.strokeStyle = 'white';
+            postDetectCtx.strokeRect(faceX, faceY, faceW, faceH);
+        }
 
         waitForFrame();
+    }
+
+    function changeFilter(num) {
+        filterNum = num;
+    }
+
+    function gaussianPDF(x, y, sigmaSq) {
+        return 1/(2 * Math.PI * sigmaSq) * Math.exp(-(x*x + y*y)/(2*sigmaSq));
+    }
+
+    function gaussianKernel(size, sigmaSq) {
+        /* Returns the convolution matrix for a gaussian blur filter */
+
+        // Create an empty matrix of size x size
+        var convMatrix = new Array(size);
+        for (var i = 0; i < size; i++) {
+            convMatrix[i] = new Array(size);
+        }
+
+        // Fill the matrix with Gaussian values
+        for (var row = 0; row < size; row++) {
+            for (var col = 0; col < size; col++) {
+                // Create x and y, which are centred versions of row and col
+                var x = col - (size - 1)/2;
+                var y = row - (size - 1)/2;
+
+                convMatrix[row][col] = gaussianPDF(x, y, sigmaSq);
+            }
+        }
+
+        // Get sum of elements
+        var matrixSum = 0;
+        for (row = 0; row < size; row++) {
+            for (col = 0; col < size; col++) {
+                matrixSum += convMatrix[row][col];
+            }
+        }
+
+        // Normalize element to sum to one
+        for (row = 0; row < size; row++) {
+            for (col = 0; col < size; col++) {
+                convMatrix[row][col] = convMatrix[row][col]/matrixSum;
+            }
+        }
+
+        return convMatrix;
+    }
+
+    function mapIndexToCoord(index) {
+        // Maps the index of a one-dimensional representation of the image
+        // to a 2d grid. Returns the row and column values.
+        var pixelNum = Math.floor(index/4);
+
+        var pixelRow = Math.floor(pixelNum/webcamCanvas.width);
+        var pixelCol = pixelNum % webcamCanvas.width;
+
+        return [pixelRow, pixelCol];
+    }
+
+    function mapCoordToIndex(row, col) {
+        // Maps the coordinate of a 2d matrix to the index when the matrix
+        // is flattened.
+        var pixelNum = 4*(webcamCanvas.width*row + col);
+        return pixelNum;
+    }
+
+    function grabSurroundingPixelIndices(imageArray, row, col, size) {
+        // Grab the surrounding pixels to convolve with a filter.
+        // row and col indicate the pixel and size indicates the 
+        // size of the filter.
+        var surroundingPixelArray = [];
+               
+        for (var i = -(size - 1)/2; i <= (size - 1)/2; i++) {
+            for (var j = -(size - 1)/2; j <= (size - 1)/2; j++) {
+                pixelNum = mapCoordToIndex(row + i, col + j);
+                surroundingPixelArray[surroundingPixelArray.length] = pixelNum;
+            }
+        }
+        return surroundingPixelArray;
+    }
+
+    function mapIndicestoValues(imageArray, indices) {
+        var valueArray = [];
+        for (var i = 0; i < indices.length; i++) {
+            valueArray[i] = imageArray[indices[i]];
+        }
+        return valueArray;
+    }
+
+    function dotProduct(x, y) {
+        var sum = 0;
+        for (var i = 0; i < x.length; i++) {
+            sum += x[i] * y[i];
+        }
+        return sum;
     }
 
     function postImage(imageData) {
@@ -86,70 +180,38 @@
 
         postReq.onload = function(event) {
             faces = postReq.response.faces;
-            console.log("HERE " + faces);
-            // faces = [1,2,3];
-            // console.log('HERE ' + faces);
-            // console.log('Faces');
-            // console.log(faces);
-            // console.log(faces.length);
-            // for (var i = 0; i < faces.length; i++) {
-            //     var face = faces[i];
-            //     // console.log(faces[0]);
-            //     ctx.fillRect(face[0], face[1], face[2], face[3]);
-            // };
         }
-
-
-        // console.log('HERE ' + faces);
-        
 
         postReq.send(imageData);
     }
 
+    var filterNum = 0;
+    var constraints = {audio: false, video: true}; 
+    var video = document.getElementById('webcamVideo');
 
+    navigator.mediaDevices.getUserMedia(constraints)
+        .then(streamVideo)
+        .catch(function(err) {
+            console.log(err.name + ": " + err.message);
+        }); // always check for errors at the end.
 
-    //Old stuff
+    // Initialize faces
+    var faces = [];
 
+    var webcamCanvas = document.getElementById('webcamCanvas');
+    var webcamCtx = webcamCanvas.getContext('2d');
+    var postDetectCanvas = document.getElementById('postDetectCanvas');
+    var postDetectCtx = postDetectCanvas.getContext('2d');
 
-    // imageData = ctx.getImageData(0, 0, 200, 200);
-    // for (i = 0; i < imageData.data.length; i++) {
-    //     if (i % 4 != 3)
-    //         imageData.data[i] = 0;
-    //     else
-    //         imageData.data[i] = 255;
-    // }
-    // console.log('imageData');
-    // console.log(imageData.data);
-    // ctx.putImageData(imageData, 10, 10);
+    var filterButtons = document.getElementsByClassName('filterButton');
 
+    for (var i = 0; i < filterButtons.length; i++) {
+        // Set a constant, otherwise the function gets written
+        const filterNum = i;
+        filterButtons[filterNum].onclick = function() {changeFilter(filterNum)};
+    }
 
-    // //button
-    // document.getElementById('snapshot').onclick = function() {
-    //     var video = document.getElementById('webcamVideo');
-    //     var canvas = document.getElementById('webcamCanvas');
-    //     var ctx = canvas.getContext('2d');
-    //     ctx.drawImage(video, 0, 0);
+    waitForFrame();
 
-    //     console.log(ctx.getImageData(0, 0, canvas.width, canvas.height).data);
-    //     console.log(ctx.getImageData(0, 0, 200, 200).data);
-
-    //     var data = ctx.getImageData(0,0,canvas.width,canvas.height);
-    //     console.log('Data Here');
-    //     console.log(data.data);
-    //     console.log(data.data[0]);
-    //     //invert each pixel
-    //     for(n=0; n<data.width*data.height; n++) {  
-    //         var index = n*4;   
-    //         data.data[index+0] = 255-data.data[index+0];  
-    //         data.data[index+1] = 255-data.data[index+1];  
-    //         data.data[index+2] = 255-data.data[index+2];  
-    //         //don't touch the alpha  
-    //     }
-    //     console.log(data.data);
-    //     console.log(data.data[0]);
-          
-    //     //set the data back  
-    //     ctx.putImageData(data,0,0);     
-    // }
-})()
+})();
 

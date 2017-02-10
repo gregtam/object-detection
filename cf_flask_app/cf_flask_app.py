@@ -46,26 +46,39 @@ def detect_faces():
         img = Image.open(StringIO(request.data))
         frame = np.array(img)
 
+
+        # # Works, No flickering
+        # f = open('equal.txt', 'r')
+        # frame = cPickle.load(f)
+
         # f = open('frame.txt', 'w')
         # cPickle.dump(frame, f)
 
-        f = open('frame.txt', 'r')
-        frame_2 = cPickle.load(f)
-        print "TEST"
-        print np.all(frame == frame_2)
-        print np.where(frame != frame_2)
-        print
+        # f = open('frame.txt', 'r')
+        # frame_2 = cPickle.load(f)
+
+        # equal_images = np.all(frame == frame_2)
+        # print equal_images
+
+        # if equal_images:
+        #     img.save('equal.png')
+        #     f = open('equal.txt', 'w')
+        #     cPickle.dump(np.asarray(img), f)
+        # else:
+        #     img.save('different.png')
+        #     f = open('different.txt', 'w')
+        #     cPickle.dump(np.asarray(img), f)
+
+        # print "{} ---- {}".format(np.sum(frame), np.sum(frame_2))
+        # print
 
         face_cascade = cv2.CascadeClassifier('../XML_files/haarcascade_frontalface_default.xml')
         faces = find_faces(face_cascade, frame, (int(frame.shape[0]/4), int(frame.shape[0]/4)))
 
-        print 'Faces: {} -- {}'.format(faces, frame[0][0:3])
-        # if not 'test.png' in os.listdir('.'):
-        # img.save('test.png')
-
-    return jsonify(faces=faces)
-    # return jsonify(faces=[[200, 200, 100, 100]])
-
+        if len(faces) > 0:
+            return jsonify(faces=faces)
+        else:
+            return jsonify(faces=[])
 
 if __name__ == "__main__":
     app.run(debug=True)
