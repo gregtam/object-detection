@@ -12,10 +12,22 @@
         }, 100);
     }
 
-    function grabFrameData() {
-        webcamCanvas.toBlob(postImage, 'image/jpeg', 1);
+    function postImage(imageData) {
+        // Post Image Data to Flask
+        var postReq = new XMLHttpRequest();
+        postReq.open('POST', '/detect_faces', true);
+        postReq.responseType = 'json';
 
+        postReq.onload = function(event) {
+            faces = postReq.response.faces;
+        }
+
+        postReq.send(imageData);
+    }
+
+    function grabFrameData() {
         webcamCtx.drawImage(video, 0, 0, webcamCanvas.width, webcamCanvas.height);
+        webcamCanvas.toBlob(postImage, 'image/jpeg', 1);
 
         // webcamCtx.font = '36px serif';
         // webcamCtx.fillText(faces + '   ' + faces.length, 0, 140);
@@ -30,16 +42,12 @@
             var faceW = face[2];
             var faceH = face[3];
 
-            // postDetectCtx.clearRect(0, 0, postDetectCanvas.width, postDetectCanvas.height);
-            // postDetectCtx.fillRect(faceX, faceY, faceW, faceH);
-            // postDetectCtx.strokeRect(faceX, faceY, faceW, faceH);
-
             // Creates a copy so we can change pixels based off original pixels.
             // If we edited imageData pixels, then the neighbouring pixel may be
             // affected (e.g., in a gaussian blur).
 
             // var convMatrix = [[0, -1, 0], [-1, 4, -1], [0, -1, 0]];
-            // var convMatrix = [0, -1, 0, -1, 4, -1, 0, -1, 0];
+            var convMatrix = [0, -1, 0, -1, 4, -1, 0, -1, 0];
 
             for (var j = 0; j < imageData.data.length; j++) {
                 var coordinates = mapIndexToCoord(j);
@@ -50,21 +58,17 @@
                     if (j % 4 < 3) {
                         if (filterNum == 0)
                             pixelCopy[j] = 255 - imageData.data[j];
-                        // pixelIndices = grabSurroundingPixelIndices(imageData.data, row, col, 21);
-                        // console.log('end');
-                        // pixelValues = mapIndicestoValues(imageData.data, pixelIndices);
-                        // pixelCopy[j] = dotProduct(pixelValues, convMatrix);
                     }
                 }
             }
-
-            // Copies pixelCopy back to imageData
-            if (filterNum == 0) {
-                for (var j = 0; j < imageData.data.length; j++) {
-                    imageData.data[j] = pixelCopy[j];
-                }
-            }
         };
+
+        // Copies pixelCopy back to imageData
+        if (filterNum == 0) {
+            for (var j = 0; j < imageData.data.length; j++) {
+                imageData.data[j] = pixelCopy[j];
+            }
+        }
 
         postDetectCtx.putImageData(imageData, 0, 0);
         if (filterNum == 1) {
@@ -78,7 +82,15 @@
     }
 
     function changeFilter(num) {
-        filterNum = num;
+        if (num != 3) {
+            filterNum = num;
+        } else {
+            // Toggle mirror
+            if (postDetectCanvas.style.transform == 'scale(-1, 1)')
+                postDetectCanvas.style.transform = 'scale(1, 1)';
+            else if (postDetectCanvas.style.transform == 'scale(1, 1)')
+                postDetectCanvas.style.transform = 'scale(-1, 1)';
+        }
     }
 
     function gaussianPDF(x, y, sigmaSq) {
@@ -172,19 +184,6 @@
         return sum;
     }
 
-    function postImage(imageData) {
-        // Post Image Data to Flask
-        var postReq = new XMLHttpRequest();
-        postReq.open('POST', '/detect_faces', true);
-        postReq.responseType = 'json';
-
-        postReq.onload = function(event) {
-            faces = postReq.response.faces;
-        }
-
-        postReq.send(imageData);
-    }
-
     var filterNum = 0;
     var constraints = {audio: false, video: true}; 
     var video = document.getElementById('webcamVideo');
@@ -202,6 +201,7 @@
     var webcamCtx = webcamCanvas.getContext('2d');
     var postDetectCanvas = document.getElementById('postDetectCanvas');
     var postDetectCtx = postDetectCanvas.getContext('2d');
+    postDetectCanvas.style.transform = 'scale(1, 1)';
 
     var filterButtons = document.getElementsByClassName('filterButton');
 
@@ -211,7 +211,6 @@
         filterButtons[filterNum].onclick = function() {changeFilter(filterNum)};
     }
 
-    waitForFrame();
+    grabFrameData();
 
 })();
-

@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# gunicorn -w 4 -b 127.0.0.1:5000 cf_flask_app:app
 
 import cPickle
 from StringIO import StringIO
@@ -11,8 +12,7 @@ from PIL import Image
 
 app = Flask(__name__)
 
-# face_cascade = cv2.CascadeClassifier('../XML_files/haarcascade_frontalface_default.xml')
-
+face_cascade = cv2.CascadeClassifier('../XML_files/haarcascade_frontalface_default.xml')
 
 def find_faces(face_cascade, frame, min_size):
     """
@@ -35,10 +35,13 @@ def find_faces(face_cascade, frame, min_size):
     else:
         return []
 
-
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('layout.html', page_name='index')
+
+@app.route('/about')
+def about_page():
+    return render_template('layout.html', page_name='about')
 
 @app.route('/detect_faces', methods=['POST'])
 def detect_faces():
@@ -46,33 +49,6 @@ def detect_faces():
         img = Image.open(StringIO(request.data))
         frame = np.array(img)
 
-
-        # # Works, No flickering
-        # f = open('equal.txt', 'r')
-        # frame = cPickle.load(f)
-
-        # f = open('frame.txt', 'w')
-        # cPickle.dump(frame, f)
-
-        # f = open('frame.txt', 'r')
-        # frame_2 = cPickle.load(f)
-
-        # equal_images = np.all(frame == frame_2)
-        # print equal_images
-
-        # if equal_images:
-        #     img.save('equal.png')
-        #     f = open('equal.txt', 'w')
-        #     cPickle.dump(np.asarray(img), f)
-        # else:
-        #     img.save('different.png')
-        #     f = open('different.txt', 'w')
-        #     cPickle.dump(np.asarray(img), f)
-
-        # print "{} ---- {}".format(np.sum(frame), np.sum(frame_2))
-        # print
-
-        face_cascade = cv2.CascadeClassifier('../XML_files/haarcascade_frontalface_default.xml')
         faces = find_faces(face_cascade, frame, (int(frame.shape[0]/4), int(frame.shape[0]/4)))
 
         if len(faces) > 0:
