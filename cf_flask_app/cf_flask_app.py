@@ -1,18 +1,20 @@
 #!/usr/bin/env python
-# gunicorn -w 4 -b 127.0.0.1:5000 cf_flask_app:app
+# gunicorn -w 4 -b 127.0.0.1:5000 cf_flask_app:app --reload
 
 import cPickle
 from StringIO import StringIO
 import os
+import sys
 
 import cv2
 from flask import Flask, jsonify, render_template, request, url_for
 import numpy as np
+import PIL
 from PIL import Image
 
 app = Flask(__name__)
 
-face_cascade = cv2.CascadeClassifier('../XML_files/haarcascade_frontalface_default.xml')
+face_cascade = cv2.CascadeClassifier('static/haarcascade_frontalface_default.xml')
 
 def find_faces(face_cascade, frame, min_size):
     """
@@ -49,12 +51,20 @@ def detect_faces():
         img = Image.open(StringIO(request.data))
         frame = np.array(img)
 
+        # Investigate this line. it causes issues when pushed
         faces = find_faces(face_cascade, frame, (int(frame.shape[0]/4), int(frame.shape[0]/4)))
 
-        if len(faces) > 0:
-            return jsonify(faces=faces)
-        else:
-            return jsonify(faces=[])
+        return jsonify(faces=faces)
+
+@app.route('/test_request', methods=['POST', 'GET'])
+def test_request():
+    if request.method == 'POST' or request.method == 'GET':
+        return 'This is a test flask get request.'
+
+@app.route('/image_test', methods=['POST'])
+def image_test():
+    if request.method == 'POST':
+        return jsonify(output='This is a test output')
 
 if __name__ == "__main__":
     app.run(debug=True)

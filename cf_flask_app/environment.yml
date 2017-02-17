@@ -5,7 +5,7 @@ dependencies:
   - pandas
   - python=2.7.11
   - numpy
-  - PIL
-  - opencv
+  - opencv=2.4.10
   - pip:
       - gunicorn
+      - pillow

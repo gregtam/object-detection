@@ -9,7 +9,7 @@
     function waitForFrame() {
         window.setTimeout(function() {
             grabFrameData();
-        }, 100);
+        }, 1000);
     }
 
     function postImage(imageData) {
@@ -19,7 +19,15 @@
         postReq.responseType = 'json';
 
         postReq.onload = function(event) {
-            faces = postReq.response.faces;
+            console.log('readyState: ' + this.readyState + '    this.status: ' + this.status);
+            if (this.readyState == 4 && this.status == 200) {
+                console.log('PostReq: ' + postReq);
+                console.log('PostReq response: ' + postReq.response);
+                faces = postReq.response.faces;
+                console.log('LOAD: ' + faces);
+                console.log('    len faces: ' + faces.length);
+                // grabFrameData();
+            }
         }
 
         postReq.send(imageData);
@@ -27,10 +35,9 @@
 
     function grabFrameData() {
         webcamCtx.drawImage(video, 0, 0, webcamCanvas.width, webcamCanvas.height);
+        console.log('------------');
+        console.log('Posting Image');
         webcamCanvas.toBlob(postImage, 'image/jpeg', 1);
-
-        // webcamCtx.font = '36px serif';
-        // webcamCtx.fillText(faces + '   ' + faces.length, 0, 140);
 
         var imageData = webcamCtx.getImageData(0, 0, webcamCanvas.width, webcamCanvas.height);
         var pixelCopy = imageData.data.slice();
@@ -46,9 +53,6 @@
             // If we edited imageData pixels, then the neighbouring pixel may be
             // affected (e.g., in a gaussian blur).
 
-            // var convMatrix = [[0, -1, 0], [-1, 4, -1], [0, -1, 0]];
-            var convMatrix = [0, -1, 0, -1, 4, -1, 0, -1, 0];
-
             for (var j = 0; j < imageData.data.length; j++) {
                 var coordinates = mapIndexToCoord(j);
                 var row = coordinates[0];
@@ -56,8 +60,9 @@
 
                 if (col >= faceX && col <= faceX + faceW && row >= faceY && row <= faceY + faceH) {
                     if (j % 4 < 3) {
-                        if (filterNum == 0)
+                        if (filterNum == 0) {
                             pixelCopy[j] = 255 - imageData.data[j];
+                        }
                     }
                 }
             }
@@ -192,7 +197,7 @@
         .then(streamVideo)
         .catch(function(err) {
             console.log(err.name + ": " + err.message);
-        }); // always check for errors at the end.
+        });
 
     // Initialize faces
     var faces = [];
