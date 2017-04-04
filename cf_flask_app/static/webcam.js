@@ -26,6 +26,7 @@
                 faces = postReq.response.faces;
                 console.log('LOAD: ' + faces);
                 console.log('    len faces: ' + faces.length);
+                console.log('    len faces[0]:' + faces[0].length);
                 // grabFrameData();
             }
         }
@@ -38,9 +39,17 @@
         console.log('------------');
         console.log('Posting Image');
         webcamCanvas.toBlob(postImage, 'image/jpeg', 1);
+        console.log('Faces: ' + faces);
 
+        waitForFrame();
+    }
+
+    function drawFilter() {
         var imageData = webcamCtx.getImageData(0, 0, webcamCanvas.width, webcamCanvas.height);
         var pixelCopy = imageData.data.slice();
+        console.log('in_filter');
+        console.log(pixelCopy);
+        console.log(faces);
 
         for (var i = 0; i < faces.length; i++) {
             var face = faces[i];
@@ -70,10 +79,12 @@
 
         // Copies pixelCopy back to imageData
         if (filterNum == 0) {
+            console.log('START');
             for (var j = 0; j < imageData.data.length; j++) {
                 imageData.data[j] = pixelCopy[j];
             }
         }
+        console.log("HERE");
 
         postDetectCtx.putImageData(imageData, 0, 0);
         if (filterNum == 1) {
@@ -83,7 +94,7 @@
             postDetectCtx.strokeRect(faceX, faceY, faceW, faceH);
         }
 
-        waitForFrame();
+        console.log('EDIT FRAME');
     }
 
     function changeFilter(num) {
@@ -216,6 +227,13 @@
         filterButtons[filterNum].onclick = function() {changeFilter(filterNum)};
     }
 
+    var captureButton = document.getElementsByClassName('captureButton')[0];
+    var testButton = document.getElementById('testButton')
+
     grabFrameData();
+
+    captureButton.onclick = function() {
+        drawFilter();
+    };
 
 })();

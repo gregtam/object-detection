@@ -48,10 +48,17 @@ body {
 .container {
     display: flex;
     justify-content: center;
+    padding: 10px;
 }
 
-.containerText {
+.container .containerText {
     width: 60%;
+}
+
+.container .containerVideo {
+    display: flex;
+    width: 70%;
+    justify-content: center;
 }
 
 .filterButton {
@@ -66,12 +73,17 @@ body {
     margin-right: 10px;
 }
 
+.captureButton {
+    background-color: black;
+    color: white;
+    padding: 6px 8px;
+    font-size: 14px;
+    border-style: none;
+}
+
 .footer {
     position: absolute;
-    bottom: 0px;
-    left: 0px;
-    right: 0px;
-    background-color: #008774;
+    height: 100px;
     text-align: center;
     font-family: Arial;
     color: white;

@@ -11,7 +11,6 @@
     <body>
         <div class='navbar'>
             <h1>Face Detection on Cloud Foundry</h1>
-            
         </div>
         <div class='optionsbar'>
             <ul>
@@ -23,17 +22,20 @@
         <div class='section'>
             {% if page_name == 'index' %}
             <div class='container'>
-                <video id='webcamVideo'></video></br>
-                <!-- For some reason, the width and height must be specified here.
-                     If it is put in the style tag at the top of the document, it
-                     takes a size of 300x150, then gets stretched, making it blurry.
-                 -->
-                <canvas id='webcamCanvas' width=640px height=480px></canvas></br>
-                <!-- We require a separate canvas for detection. If we edited
-                     the webcamCanvas, then the algorithm would not run on it.
-                -->
+                <div class='containerVideo'>
+                    <video id='webcamVideo'></video>
 
-                <canvas id='postDetectCanvas' width=640px height=480px></canvas></br>
+                    <!-- For some reason, the width and height must be specified here.
+                         If it is put in the style tag at the top of the document, it
+                         takes a size of 300x150, then gets stretched, making it blurry.
+                     -->
+                    <canvas id='webcamCanvas' width=640px height=480px></canvas>
+
+                    <!-- We require a separate canvas for detection. If we edited
+                         the webcamCanvas, then the algorithm would not run on it.
+                    -->
+                    <canvas id='postDetectCanvas' width=640px height=480px></canvas>
+                </div>
             </div>
             <div class='container'>
                 <button class='filterButton'>Invert Face Colours</button>
@@ -41,14 +43,13 @@
                 <button class='filterButton'>Draw White Box</button>
                 <button class='filterButton'>Toggle Screen Mirror</button>
                 <button class='filterButton'>Nothing</button>
+                <button class='captureButton'>Capture Image</button>
             </div>
 
             {% elif page_name == 'about' %}
             <div class='container'>
                 <div class='containerText'>
                     <p>This application demonstrates face detection via the <a href='http://docs.opencv.org/trunk/d7/d8b/tutorial_py_face_detection.html'>OpenCV</a> library in Python. Specifically, it uses the Haar-like features proposed by Paul Viola and Michael Jones to train and detect faces. This app is created using <a href='http://flask.pocoo.org/'>Flask</a>, a microframework for web development in Python, and is hosted on <a href='https://pivotal.io/platform'>Pivotal Cloud Foundry</a>.</p>
-
-
                 </div>
             </div>
             {% endif %}
@@ -56,5 +57,7 @@
 
         <script src="{{ url_for('static', filename='webcam.js') }}"></script>
 
-        </body>
+        <div class='footer'></div>
+
+    </body>
 </html>

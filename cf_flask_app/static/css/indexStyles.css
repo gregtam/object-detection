@@ -1,18 +1,15 @@
 #webcamVideo {
-    background-color: #666;
-    left: 100px;
-    right: 100px;
+    left: 200px;
     width: 640px;
     height: 480px;
-    display: none;
+    padding-right: 100px;
 }
 #webcamCanvas {
-    /*position: absolute;*/
-    position: relative;
-    background-color: red;
+    position: absolute;
+    background-color: gray;
     display: none;
 }
 #postDetectCanvas {
     position: relative;
-    background-color: blue;
+    background-color: gray;
 }
