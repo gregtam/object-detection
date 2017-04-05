@@ -9,10 +9,10 @@
   {% endif %}
 </head>
   <body>
-    <div class='navbar'>
+    <div id='navbar'>
       <h1>Face Detection on Cloud Foundry</h1>
     </div>
-    <div class='optionsbar'>
+    <div id='optionsbar'>
       <ul>
         <li><a href='/'>The App</a></li>
         <li><a href='/about'>About</a></li>
@@ -22,13 +22,10 @@
     <div class='section'>
       {% if page_name == 'index' %}
       <div class='container'>
-        <div class='containerText'>
-          <p>This Face Detection app will only work if in Chrome or Firefox. Choose the filter by selecting one of the green filter buttons. Then press the black 'Capture Image' button to take a picture. This will save a picture of the webcam image to the box on the right with the detected face on the right. Note that the algorithm only detects faces that are directly facing the camera.</p>
-        </div>
-      </div>
-      <div class='container'>
         <div class='containerVideo'>
-          <video id='webcamVideo'></video>
+          <div class='video'>
+           <video id='webcamVideo'></video>
+          </div>
 
           <!-- For some reason, the width and height must be specified here.
              If it is put in the style tag at the top of the document, it
@@ -36,25 +33,51 @@
            -->
           <canvas id='webcamCanvas' width=640px height=480px></canvas>
 
-          <!-- We require a separate canvas for detection. If we edited
+
+          <div class='video'>
+             <!-- We require a separate canvas for detection. If we edited
              the webcamCanvas, then the algorithm would not run on it.
-          -->
-          <canvas id='postDetectCanvas' width=640px height=480px></canvas>
+              -->
+            <canvas id='postDetectCanvas' width=640px height=480px></canvas>
+          </div>
         </div>
       </div>
+
       <div class='container'>
         <button class='filterButton'>Invert Face Colours</button>
         <button class='filterButton'>Fill Black Box</button>
         <button class='filterButton'>Draw White Box</button>
-        <button class='filterButton'>Toggle Screen Mirror</button>
         <button class='filterButton'>Nothing</button>
-        <button class='captureButton'>Capture Image</button>
+        <button class='filterButton' id='toggleMirrorButton'>Toggle Screen Mirror</button>
+        <button class='filterButton' id='captureButton'>Capture Image</button>
+      </div>
+
+      <div class='container'>
+        <div class='containerText'>
+          <h1>Instructions</h1>
+          <p>This Face Detection app will only work if in Chrome or Firefox. Choose a filter by selecting one of the green filter buttons above. Then press the black 'Capture Image' button to take a picture. This will display the webcam image in the box on the right with the detected face shown. Note that the algorithm only detects faces that are facing the camera straight on.</p>
+        </div>
       </div>
       
       {% elif page_name == 'about' %}
       <div class='container'>
         <div class='containerText'>
-          <p>This application demonstrates face detection via the <a href='http://docs.opencv.org/trunk/d7/d8b/tutorial_py_face_detection.html'>OpenCV</a> library in Python. Specifically, it uses the Haar-like features proposed by Paul Viola and Michael Jones to train and detect faces. This app is created using <a href='http://flask.pocoo.org/'>Flask</a>, a microframework for web development in Python, and is hosted on <a href='https://pivotal.io/platform'>Pivotal Cloud Foundry</a>.</p>
+          <h1>Description</h1>
+          <p>This application demonstrates face detection via the <a href='https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_setup/py_intro/py_intro.html#intro'>OpenCV</a> library in Python. Specifically, it uses the Haar-like features proposed by Paul Viola and Michael Jones to train and detect faces. This app is created using <a href='http://flask.pocoo.org/'>Flask</a>, a microframework for web development in Python, and is hosted on <a href='https://pivotal.io/platform'>Pivotal Cloud Foundry</a>.</p>
+          </br>
+
+          <h1>What is Object Detection?</h1>
+          <p>Object detection is a subdivision of computer vision and image processing that involves locating a specific object or series of objects within a photo or video. Images, and by extension video frames, can be represented as a 3-dimensional array reprensenting the intensities of the red, green, and blue channels of each pixel. At a high level, we can apply supervised learning techniques to these pixel values.</p>
+          </br>
+
+          <h1>Face Detection</h1>
+          <p>To train a face detector, we require training examples, that is, images of faces and other non-face objects. Using these training images, we can apply our Haar-like features to find distinguish between faces and non-faces. More information about this process can be found <a href='http://docs.opencv.org/trunk/d7/d8b/tutorial_py_face_detection.html'>here</a>.
+          </p>
+          </br>
+
+          <h1>Comments or Suggestions</h1>
+          <p>If you have any comments or suggestions please reach out to Greg Tam (<a href='mailto:gtam@pivotal.io'>gtam@pivotal.io</a>).</p>
+
         </div>
       </div>
       {% endif %}
@@ -62,7 +85,10 @@
 
     <script src="{{ url_for('static', filename='webcam.js') }}"></script>
 
-    <div class='footer'></div>
-
+    <div class='section' style='height: 60%; justify-content: flex-end;'>
+      <div id='footer'>
+        <p>Copyright &copy; Pivotal Data Science 2017</p>
+      </div>
+    </div>
   </body>
 </html>

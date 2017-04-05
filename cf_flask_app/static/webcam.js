@@ -77,21 +77,33 @@
       postDetectCtx.fillRect(faceX, faceY, faceW, faceH);
     } else if (filterNum == 2) {
       postDetectCtx.strokeStyle = 'white';
-      postDetectCtx.strokeRect(faceX, faceY, faceW, faceH);
+      // Draw three lines so that it appears thicker
+      for (var i = 0; i < 8; i++) {
+        postDetectCtx.strokeRect(faceX + i, faceY + i, faceW - 2*i, faceH - 2*i);
+      }
     }
-
   }
 
   function changeFilter(num) {
-    if (num != 3) {
+    if (num < 4) {
       filterNum = num;
-    } else {
-      // Toggle mirror
-      if (postDetectCanvas.style.transform == 'scale(-1, 1)')
-        postDetectCanvas.style.transform = 'scale(1, 1)';
-      else if (postDetectCanvas.style.transform == 'scale(1, 1)')
-        postDetectCanvas.style.transform = 'scale(-1, 1)';
+
+      filterButtons[num].style.background = '#008774';
+      for (var i = 0; i < filterButtons.length - 1; i++) {
+        if (i != num) {
+          filterButtons[i].style.background = '#00AE9E';
+        }
+      }
     }
+  }
+
+  function toggleMirror() {
+    console.log('HERE');
+    // Toggle mirror
+    if (postDetectCanvas.style.transform == 'scale(-1, 1)')
+      postDetectCanvas.style.transform = 'scale(1, 1)';
+    else if (postDetectCanvas.style.transform == 'scale(1, 1)')
+      postDetectCanvas.style.transform = 'scale(-1, 1)';
   }
 
   function gaussianPDF(x, y, sigmaSq) {
@@ -205,20 +217,26 @@
   postDetectCanvas.style.transform = 'scale(1, 1)';
 
   var filterButtons = document.getElementsByClassName('filterButton');
-
+  // Initialize first filterButton
+  filterButtons[0].style.background = '#008774';
   for (var i = 0; i < filterButtons.length; i++) {
     // Set a constant, otherwise the function gets written
     const filterNum = i;
-    filterButtons[filterNum].onclick = function() {changeFilter(filterNum)};
+    filterButtons[filterNum].onclick = function() {
+      changeFilter(filterNum);
+    };
   }
 
-  var captureButton = document.getElementsByClassName('captureButton')[0];
-  var testButton = document.getElementById('testButton')
+  var toggleMirrorButton = document.getElementById('toggleMirrorButton');
+  toggleMirrorButton.onclick = function() {
+    toggleMirror();
+  };
 
-  grabFrameData();
-
+  var captureButton = document.getElementById('captureButton');
   captureButton.onclick = function() {
     drawFilter();
   };
+
+  grabFrameData();
 
 })();

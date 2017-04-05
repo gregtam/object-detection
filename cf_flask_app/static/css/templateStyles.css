@@ -4,35 +4,37 @@ body {
   border: 0;
 }
 
-.navbar {
+#navbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background-color: #008774;
   height: 100px;
 }
 
-.navbar h1 {
+#navbar h1 {
   text-align: center;
   color: white;
   font-family: Arial;
-  padding-top: 30px;
 }
 
-.optionsbar {
+#optionsbar {
   display: flex;
   background-color: #00AE9E;
   justify-content: center;
 }
 
-.optionsbar ul {
+#optionsbar ul {
   padding: 0px 0px 0px 0px;
   margin: 10px 0px 10px 0px;
 }
 
-.optionsbar li {
+#optionsbar li {
   display: inline;
   padding: 0px 20px 0px 20px;
 }
 
-.optionsbar li a {
+#optionsbar li a {
   text-decoration: none;
   font-family: Arial;
   color: white;
@@ -53,6 +55,11 @@ body {
   padding-right: 10px;
 }
 
+.container h1 {
+  font-family: Arial;
+  font-size: 30;
+}
+
 .container p {
   font-family: Arial;
   font-size: 18;
@@ -64,12 +71,17 @@ body {
 
 .container .containerVideo {
   display: flex;
-  width: 70%;
+  width: 90%;
   justify-content: center;
+  flex-wrap: wrap;
+}
+
+.container .containerVideo .video {
+  padding: 10px 25px;
 }
 
 .filterButton {
-  background-color: #008774;
+  background-color: #00AE9E;
   color: white;
   padding: 6px 8px;
   font-size: 14px;
@@ -80,18 +92,20 @@ body {
   margin-right: 10px;
 }
 
-.captureButton {
+#captureButton {
   background-color: black;
-  color: white;
-  padding: 6px 8px;
-  font-size: 14px;
-  border-style: none;
 }
 
-.footer {
-  position: absolute;
+#footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   height: 100px;
   text-align: center;
   font-family: Arial;
+  background-color: #008774;
+}
+
+#footer p {
   color: white;
 }
