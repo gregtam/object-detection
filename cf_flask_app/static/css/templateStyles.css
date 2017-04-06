@@ -2,6 +2,9 @@ body {
   margin: 0;
   padding: 0;
   border: 0;
+
+  display: flex;
+  flex-flow: column nowrap;
 }
 
 #navbar {
@@ -43,8 +46,9 @@ body {
 
 .section {
   display: flex;
-  justify-content: center;
   flex-direction: column;
+  flex-grow: 1;
+  align-items: center;
 }
 
 .container {
@@ -58,42 +62,46 @@ body {
 .container h1 {
   font-family: Arial;
   font-size: 30;
+  color: #424242;
 }
 
 .container p {
   font-family: Arial;
   font-size: 18;
+  color: #686868;
 }
 
-.container .containerText {
-  width: 60%;
+.containerText {
+  flex-direction: column;
+  width: 50%;
 }
 
-.container .containerVideo {
-  display: flex;
-  width: 90%;
-  justify-content: center;
+.containerVideo {
   flex-wrap: wrap;
 }
 
-.container .containerVideo .video {
+.containerVideo .video {
   padding: 10px 25px;
 }
 
-.filterButton {
-  background-color: #00AE9E;
+.btn {
   color: white;
   padding: 6px 8px;
   font-size: 14px;
   border-style: none;
+  background-color: #00AE9E;
 }
 
-.filterButton:not(:last-child) {
+.btn:not(:last-child) {
   margin-right: 10px;
 }
 
-#captureButton {
+.btn-black {
   background-color: black;
+}
+
+.btn-container {
+  margin-top: 20px;
 }
 
 #footer {

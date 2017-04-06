@@ -21,42 +21,46 @@
 
     <div class='section'>
       {% if page_name == 'index' %}
-      <div class='container'>
-        <div class='containerVideo'>
-          <div class='video'>
-           <video id='webcamVideo'></video>
+      <div class='container containerVideo'>
+        <div class='video'>
+         <video id='webcamVideo'></video>
+         <p>Choose a filter:</p>
+         <div class='btn-container'>
+           <button class='btn'>Invert Face Colours</button>
+            <button class='btn'>Fill Black Box</button>
+            <button class='btn'>Draw White Box</button>
+            <button class='btn'>Nothing</button>
+         </div>
+         
+        </div>
+
+        <!-- For some reason, the width and height must be specified here.
+           If it is put in the style tag at the top of the document, it
+           takes a size of 300x150, then gets stretched, making it blurry.
+         -->
+        <canvas id='webcamCanvas' width=640px height=480px></canvas>
+        
+
+
+        <div class='video'>
+           <!-- We require a separate canvas for detection. If we edited
+           the webcamCanvas, then the algorithm would not run on it.
+            -->
+          <canvas id='postDetectCanvas' width=640px height=480px></canvas>
+          <p>Capture Image and Detect Faces:</p>
+          <div class='btn-container'>
+            <button class='btn btn-black' id='captureButton'>Capture Image</button>
+            <button class='btn' id='toggleMirrorButton'>Toggle Screen Mirror</button>
           </div>
-
-          <!-- For some reason, the width and height must be specified here.
-             If it is put in the style tag at the top of the document, it
-             takes a size of 300x150, then gets stretched, making it blurry.
-           -->
-          <canvas id='webcamCanvas' width=640px height=480px></canvas>
-
-
-          <div class='video'>
-             <!-- We require a separate canvas for detection. If we edited
-             the webcamCanvas, then the algorithm would not run on it.
-              -->
-            <canvas id='postDetectCanvas' width=640px height=480px></canvas>
-          </div>
+          
         </div>
       </div>
-
-      <div class='container'>
-        <button class='filterButton'>Invert Face Colours</button>
-        <button class='filterButton'>Fill Black Box</button>
-        <button class='filterButton'>Draw White Box</button>
-        <button class='filterButton'>Nothing</button>
-        <button class='filterButton' id='toggleMirrorButton'>Toggle Screen Mirror</button>
-        <button class='filterButton' id='captureButton'>Capture Image</button>
-      </div>
-
-      <div class='container'>
-        <div class='containerText'>
+      <div class='container containerText'>
+      <!-- <div class='container'> -->
+        <!-- <div class='containerText'> -->
           <h1>Instructions</h1>
           <p>This Face Detection app will only work if in Chrome or Firefox. Choose a filter by selecting one of the green filter buttons above. Then press the black 'Capture Image' button to take a picture. This will display the webcam image in the box on the right with the detected face shown. Note that the algorithm only detects faces that are facing the camera straight on.</p>
-        </div>
+        <!-- </div> -->
       </div>
       
       {% elif page_name == 'about' %}
@@ -85,10 +89,8 @@
 
     <script src="{{ url_for('static', filename='webcam.js') }}"></script>
 
-    <div class='section' style='height: 60%; justify-content: flex-end;'>
-      <div id='footer'>
+    <div id='footer'>
         <p>Copyright &copy; Pivotal Data Science 2017</p>
-      </div>
     </div>
   </body>
 </html>

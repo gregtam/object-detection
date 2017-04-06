@@ -216,7 +216,7 @@
   var postDetectCtx = postDetectCanvas.getContext('2d');
   postDetectCanvas.style.transform = 'scale(1, 1)';
 
-  var filterButtons = document.getElementsByClassName('filterButton');
+  var filterButtons = document.getElementsByClassName('btn');
   // Initialize first filterButton
   filterButtons[0].style.background = '#008774';
   for (var i = 0; i < filterButtons.length; i++) {
