@@ -60,9 +60,9 @@ function drawFilter() {
 function changeFilter(num) {
   if (num < 4) {
     filterNum = num;
-
+    
     filterButtons[num].style.background = '#008774';
-    for (var i = 0; i < filterButtons.length - 1; i++) {
+    for (var i = 0; i < 4; i++) {
       if (i != num) {
         filterButtons[i].style.background = '#00AE9E';
       }
@@ -196,11 +196,13 @@ var webcamCtx = webcamCanvas.getContext('2d');
 var filterButtons = document.getElementsByClassName('btn');
 // Initialize first filterButton
 filterButtons[0].style.background = '#008774';
-for (var i = 0; i < filterButtons.length; i++) {
-  // Set a constant, otherwise the function gets written
+for (var i = 0; i < 4; i++) {
+  // Set a constant, otherwise the the loop will not properly cycle through all
+  // of the buttons
   const filterNum = i;
   filterButtons[filterNum].onclick = function() {
     changeFilter(filterNum);
+    console.log(filterNum);
   };
 }
 
@@ -208,14 +210,30 @@ var toggleMirrorButton = document.getElementById('toggleMirrorButton');
 toggleMirrorButton.onclick = function() {
   toggleMirror();
 };
+toggleMirrorButton.onmousedown = function() {
+  toggleMirrorButton.style.backgroundColor = '#008774';
+}
+toggleMirrorButton.onmouseup = function() {
+  toggleMirrorButton.style.backgroundColor = '#00AE9E';
+}
 
 var captureButton = document.getElementById('captureButton');
-captureButton.onclick = function() {
+captureButton.onmousedown = function() {
+  // Change colour when button gets pressed
+  // captureButton.style.backgroundColor = '#008774';
+  captureButton.style.backgroundColor = '#444444';
+};
+captureButton.onmouseup = function() {
+  // Change colour when button is released, grab the frame, then detect faces
+  // and draw the filter.
+
   // We use a promise to separate frame grabbing and drawing the filter
   // because they are asynchronous processes and a new frame will be created
   // by the time the face is detected. We need to grab the frame, wait until
   // that finishes, then draw the filter.
 
+  console.log(filterNum);
+  captureButton.style.backgroundColor = 'black';
   var grabFramePromise = new Promise((resolve, reject) => {
     function postImage(imageData) {
       // Post Image Data to Flask
