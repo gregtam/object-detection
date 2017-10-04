@@ -7,4 +7,4 @@ This repo illustrates how to use [OpenCV](http://docs.opencv.org/3.0-beta/doc/py
 - local_flask_app: A local flask implementation of the face detection algorithm
 - cf_flask_app: A flask implementation of the face detection algorithm that can be pushed to Cloud Foundry
 
-View the final application [here](https://face-detection.cfapps.pez.pivotal.io/)
+View the final application [here](https://face-detection.cfapps.pez.pivotal.io/).
